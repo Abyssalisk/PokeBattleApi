@@ -1,64 +1,76 @@
-﻿using System;
+﻿using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace PokeApiBattleSimulator
 {
     class Program
     {
-        Random r;
+        static Random r = new Random();
 
-        // method to get a pokemon
+        public class Pokemon
+        {      
+            public string name { get; set; }
+            public List<Move> moves { get; set; }
+            public List<Stat> stats { get; set; }
 
-
-        // sub method to get moves of a pokemon
-
-
-        // createPokemon (populates the values for the pokemon from the response
-
-
-        // doDamage(pokemon1, pokemon2)
-
-
-        public Program()
-        {
-            r = new Random(400);
-        }
-
-
-
-        class Pokemon
-        {
-
-            class Move
+            public class Move2
             {
-                string name { get; set; }
-                int damage { get; set; }
+                public string name { get; set; }
+                public string url { get; set; }
             }
 
-            string name { get; set; }
-            int health { get; set; }
-            List<Move> moves { get; set; }
+            public class Move
+            {
+                public Move2 move { get; set; }
+            }
+
+            public class Stat2
+            {
+                public string name { get; set; }
+                public string url { get; set; }
+            }
+
+            public class Stat
+            {
+                public int base_stat { get; set; }
+                public Stat2 stat { get; set; }
+            }
+
+            public static Pokemon getNewPokemon(string ID)
+            {
+                var client = new RestClient($"https://pokeapi.co/api/v2/pokemon/{ID}/");
+                var request = new RestRequest(Method.GET);
+                request.AddHeader("cache-control", "no-cache");
+                IRestResponse response = client.Execute(request);
+
+                var pokeName = JsonConvert.DeserializeObject<Pokemon>(response.Content);
+                return pokeName;
+            }
+
+            // sub method to get moves of a pokemon
 
 
+            // createPokemon (populates the values for the pokemon from the response
+
+
+            // doDamage(pokemon1, pokemon2)
 
         }
-
-
-
-
 
         static void Main(string[] args)
         {
+            var pokeID = r.Next(1, 785).ToString();
+            var p1 = Pokemon.getNewPokemon(pokeID);
+            Console.WriteLine(p1.name);
 
-            // create pokemon 1, 2
-            // set values
-
-
-
-
+            pokeID = r.Next(1, 785).ToString();
+            var p2 = Pokemon.getNewPokemon(pokeID);
+            Console.WriteLine(p2.name);
         }
     }
 }
